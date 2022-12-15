@@ -1,0 +1,19 @@
+{
+	"name": "mytravelbook-be",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ork89/mytravelbook-be.git"
+	},
+	"author": "Ori M. Kosman",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ork89/mytravelbook-be/issues"
+	},
+	"homepage": "https://github.com/ork89/mytravelbook-be#readme"
+}
