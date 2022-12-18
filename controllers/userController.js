@@ -56,7 +56,7 @@ const loginUser = asyncHandler(async (req, res) => {
 	// Find user by email
 	const user = await User.findOne({ email });
 
-	// Compare the sent password with the one listed for the user in the DB
+	// Compare the password from the login with the one listed for the user in the DB
 	if (user && (await bcrypt.compare(password, user.password))) {
 		res.json({
 			_id: user.id,
@@ -73,10 +73,53 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get current logged user data
-// @route   GET /api/users/me
+// @route   GET /api/users/currentUser
 // @access  Private
 const getCurrentUser = asyncHandler(async (req, res) => {
 	res.status(200).json(req.user);
+});
+
+// @desc	Update current user
+// @route	PUT /api/users/id
+// @access	Private
+const updateUser = asyncHandler(async (req, res) => {
+	const userId = req.params.id;
+	const user = await User.findById(userId);
+
+	if (!user) {
+		res.status(400);
+		throw new Error(`User with Id: ${userId} does not exist`);
+	}
+
+	// Hashing password
+	const salt = await bcrypt.genSalt(10);
+	const hashedPwd = await bcrypt.hash(req.body.password, salt);
+
+	if (!(await bcrypt.compare(user.password, hashedPwd))) {
+		req.body.password = hashedPwd;
+	}
+
+	// Update the user's data
+	const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true });
+	res.status(200).json(updatedUser);
+});
+
+// @desc	Delete current user
+// @route	DELETE /api/users/id
+// @access	Private
+
+const unregisterUser = asyncHandler(async (req, res) => {
+	const userId = req.params.id;
+	const user = await User.findById(userId);
+
+	if (!user) {
+		res.status(400);
+		throw new Error(`User with Id: ${userId} does not exist`);
+	}
+
+	await User.deleteOne();
+
+	res.status(200).send(`User ${user.name} id: ${userId} was successfully unregistered`);
 });
 
 // Generate JWT Token
@@ -84,4 +127,4 @@ const generateToken = id => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-module.exports = { registerUser, loginUser, getCurrentUser };
+module.exports = { registerUser, loginUser, getCurrentUser, updateUser, unregisterUser };
