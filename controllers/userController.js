@@ -7,10 +7,10 @@ const User = require('../models/userModel.js');
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-	const { name, email, password } = req.body;
+	const { userName, email, password } = req.body;
 
 	// verify request integrity
-	if (!name || !email || !password) {
+	if (!userName || !email || !password) {
 		res.status(400);
 		throw new Error('Please fill all fields');
 	}
@@ -29,7 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 	// Create user
 	const newUser = await User.create({
-		name,
+		name: userName,
 		email,
 		password: hashedPwd,
 	});
@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
 	if (newUser) {
 		return res.status(201).json({
 			_id: newUser.id,
-			name: newUser.name,
+			name: newUser.userName,
 			email: newUser.email,
 			token: generateToken(newUser._id),
 		});
